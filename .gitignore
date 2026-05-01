@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Generated outputs (large files — run pipeline to regenerate)
+outputs/full/embeddings/
+outputs/full/faiss/
+outputs/full/*.duckdb
+outputs/live_demo/embeddings/
+outputs/live_demo/faiss/
+outputs/live_demo/*.duckdb
+
+# Raw data (large — download separately)
+data/full/raw_wiki.jsonl
+data/full/update_wiki.jsonl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db

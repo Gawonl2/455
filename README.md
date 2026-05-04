@@ -150,6 +150,26 @@ python src/retrieve.py \
 
 ---
 
+## Google Colab Quickstart
+
+This project can run in Colab if you install dependencies and set the working directory to the cloned repo.
+
+```bash
+# In Colab cell 1
+!git clone <YOUR_REPO_URL> /content/455-final
+%cd /content/455-final
+!pip install -r requirements.txt
+```
+
+Then run build/retrieve commands as usual from `/content/455-final`.
+
+Notes:
+- Colab runtimes are ephemeral. Reinstall dependencies each new runtime.
+- If using Google Drive instead of cloning, set `%cd` to that repo root before running commands.
+- The notebooks (`notebooks/presentation.ipynb`, `notebooks/live_demo.ipynb`) now include setup logic that installs missing core Python packages and detects project root on local and Colab environments.
+
+---
+
 ## Monitoring Artifacts
 
 All stored in DuckDB (`outputs/{dataset}/wiki[_demo].duckdb`):

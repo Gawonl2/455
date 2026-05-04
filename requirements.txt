@@ -8,3 +8,4 @@ tqdm>=4.65.0
 datasets>=2.14.0
 pyarrow>=12.0.0
 torch>=2.0.0
+openai

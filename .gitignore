@@ -32,3 +32,6 @@ data/full/update_wiki.jsonl
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets
+gpt.txt

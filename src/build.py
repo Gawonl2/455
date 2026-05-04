@@ -3,13 +3,13 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
-import duckdb
 
 from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer
+import duckdb
 
 from src import monitoring, ingest, clean, curate, chunk, embed, index_ivf, audit
-from src.config import EMBEDDING_MODEL
+from src.config import EMBEDDING_MODEL, get_embedding_device
 from src.utils import now_utc
 
 
@@ -47,9 +47,11 @@ def run_pipeline(mode: str, dataset_name: str, input_path: str,
 
     try:
         # Load tokenizer and model
+        embed_device = get_embedding_device()
         print(f"[SETUP] Loading tokenizer and model: {EMBEDDING_MODEL}")
+        print(f"[SETUP] Embedding device: {embed_device}")
         tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
-        model = SentenceTransformer(EMBEDDING_MODEL)
+        model = SentenceTransformer(EMBEDDING_MODEL, device=embed_device)
         print(f"[SETUP] Model loaded.")
 
         # ---- STAGE: INGEST ----

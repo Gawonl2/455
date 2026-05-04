@@ -11,45 +11,29 @@ from src.utils import compute_embedding_hash
 
 def embed_new_chunks(conn, run_id: int, output_dir: str, model) -> int:
     """
-    Embed all chunks from the current run (source_run_id=run_id).
+    Embed all active chunks that do not yet have an active embedding.
     Save vectors to {output_dir}/embeddings/run_{run_id}.npy
     Insert into fact_embeddings.
     Returns count of embeddings created.
     """
     rows = conn.execute(
         """
-        SELECT chunk_id, chunk_text
-        FROM fact_chunks
-        WHERE source_run_id=? AND is_active=TRUE
-        """,
-        [run_id]
+        SELECT fc.chunk_id, fc.chunk_text
+        FROM fact_chunks fc
+        LEFT JOIN fact_embeddings fe
+          ON fe.chunk_id = fc.chunk_id AND fe.is_active=TRUE
+        WHERE fc.is_active=TRUE
+          AND fe.chunk_id IS NULL
+        ORDER BY fc.chunk_id
+        """
     ).fetchall()
 
     if not rows:
-        print(f"[EMBED] No new chunks for run {run_id}")
+        print(f"[EMBED] No missing active-chunk embeddings for run {run_id}")
         return 0
 
-    # Check for already-embedded chunks to avoid double-inserting
-    existing_embeddings = set()
-    existing_rows = conn.execute(
-        """
-        SELECT chunk_id FROM fact_embeddings
-        WHERE source_run_id=?
-        """,
-        [run_id]
-    ).fetchall()
-    for r in existing_rows:
-        existing_embeddings.add(r[0])
-
-    # Filter to only chunks not yet embedded
-    rows_to_embed = [(cid, ct) for cid, ct in rows if cid not in existing_embeddings]
-
-    if not rows_to_embed:
-        print(f"[EMBED] All chunks for run {run_id} already embedded")
-        return 0
-
-    chunk_ids = [r[0] for r in rows_to_embed]
-    chunk_texts = [r[1] for r in rows_to_embed]
+    chunk_ids = [r[0] for r in rows]
+    chunk_texts = [r[1] for r in rows]
 
     # Prepend passage prefix for encoding
     texts_with_prefix = [f"{PASSAGE_PREFIX}{ct}" for ct in chunk_texts]

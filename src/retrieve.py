@@ -5,11 +5,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import argparse
 import numpy as np
 import pandas as pd
+from sentence_transformers import SentenceTransformer
 import faiss
 import duckdb
-from sentence_transformers import SentenceTransformer
 
-from src.config import EMBEDDING_MODEL, QUERY_PREFIX
+from src.config import EMBEDDING_MODEL, QUERY_PREFIX, get_embedding_device
 
 
 def load_retriever(db_path: str, index_path: str) -> dict:
@@ -46,8 +46,8 @@ def retrieve(query: str, db_path: str, index_path: str, top_k: int = 5) -> pd.Da
     Returns DataFrame with columns: rank, score, title, url, doc_id,
                                     chunk_id, chunk_text
     """
-    # Load model
-    model = SentenceTransformer(EMBEDDING_MODEL)
+    # Load model (GPU when available — same policy as build/embed)
+    model = SentenceTransformer(EMBEDDING_MODEL, device=get_embedding_device())
 
     # Embed query
     query_text = f"{QUERY_PREFIX}{query}"
